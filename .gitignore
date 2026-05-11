@@ -36,7 +36,7 @@ data/oncology_mvp/
 tmp_extract_zip.py
 *.log
 
-# Large video files (exceed GitHub 100MB limit)
-*.mp4
+# Large video files (exceed GitHub 100MB limit) — commit compressed versions only
+MedAI-demo.mp4
 *.mov
 *.avi
