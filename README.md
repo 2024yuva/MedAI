@@ -107,18 +107,29 @@ MedAI/
 └── README.md
 ```
 ---
-## Snippets
- -Home Page
- ![alt text](MedAI-Home.jpg)
 
- -Chat Interface
- ![chat](MedAI-chat.jpg)
+## Screenshots
 
- ![alt text](MedAI-chat-sources.jpg)
+**Home**
+
+![MedAI home screen](MedAI-Home.jpg)
+
+**Chat interface**
+
+![MedAI chat](MedAI-chat.jpg)
+
+**Source citations and confidence**
+
+![MedAI sources](MedAI-chat-sources.jpg)
 
 ---
-## Demo Video
-<video controls src="MedAI-demo.mp4" title="Working of MedAI"></video>
+
+## Demo
+
+[![Watch the demo](MedAI-Home.jpg)](MedAI-demo_video.mp4)
+
+> Click the image above to watch the demo video, or [download it directly](MedAI-demo_video.mp4).
+
 ---
 
 ## Prerequisites
