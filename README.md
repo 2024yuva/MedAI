@@ -106,7 +106,19 @@ MedAI/
 ├── requirements.txt
 └── README.md
 ```
+---
+## Snippets
+ -Home Page
+ ![alt text](MedAI-Home.jpg)
 
+ -Chat Interface
+ ![chat](MedAI-chat.jpg)
+
+ ![alt text](MedAI-chat-sources.jpg)
+
+---
+## Demo Video
+<video controls src="MedAI-demo.mp4" title="Working of MedAI"></video>
 ---
 
 ## Prerequisites

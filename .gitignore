@@ -35,3 +35,8 @@ data/oncology_mvp/
 # Temp files
 tmp_extract_zip.py
 *.log
+
+# Large video files (exceed GitHub 100MB limit)
+*.mp4
+*.mov
+*.avi
