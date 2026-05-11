@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <title>MedAI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script>
+    try {
+      const t = localStorage.getItem("medai_theme");
+      if (t === "light") document.documentElement.setAttribute("data-theme", "light");
+    } catch(e) {}
+  </script>
+  <link rel="stylesheet" href="/static/styles.css?v=5" />
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-top">
+      <div class="logo">
+        <div class="logo-mark">MA</div>
+        <span class="logo-name">MedAI</span>
+      </div>
+      <button class="sb-close-btn" id="sb-close" aria-label="Close">✕</button>
+    </div>
+
+    <div class="sb-search">
+      <input id="chat-search" type="search" placeholder="Search chats…" autocomplete="off" />
+    </div>
+
+    <button id="new-chat-btn" class="new-chat-btn">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      New Chat
+    </button>
+
+    <div id="chat-groups" class="chat-groups"></div>
+  </aside>
+
+  <div class="sidebar-overlay" id="sb-overlay"></div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-brand">
+        <div class="logo-mark sm">MA</div>
+        <span class="topbar-title">MedAI</span>
+      </div>
+      <div class="topbar-right">
+        <button class="theme-btn" id="theme-btn" aria-label="Toggle theme" title="Toggle theme">
+          <span id="theme-icon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MESSAGES -->
+    <div class="messages-wrap">
+      <div id="messages" class="messages"></div>
+    </div>
+
+    <!-- COMPOSER -->
+    <div class="composer-wrap">
+      <form id="ask-form" class="composer">
+        <textarea id="q-input" rows="1" placeholder="Ask a medical question…" required></textarea>
+        <button type="submit" id="send-btn" aria-label="Send">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M2 9h14M10 3l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<!-- DELETE DIALOG -->
+<dialog id="del-dialog" class="del-dialog">
+  <form method="dialog" class="del-content">
+    <h2>Delete this chat?</h2>
+    <p>This cannot be undone.</p>
+    <div class="del-actions">
+      <button value="cancel" class="btn-cancel">Cancel</button>
+      <button value="confirm" class="btn-danger">Delete</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="/static/app.js?v=5" defer></script>
+</body>
+</html>
