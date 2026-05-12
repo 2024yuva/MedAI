@@ -205,6 +205,7 @@ Open `http://127.0.0.1:8000` in your browser.
 | GET | `/health` | Overall system health (Ollama reachability, active model) |
 | GET | `/health/generation` | Detailed generation backend status |
 | POST | `/ask` | Submit a question, receive an answer |
+| POST | `/ablation` | Run all 4 ablation experiments for one question |
 
 ### POST /ask
 
@@ -238,6 +239,42 @@ Open `http://127.0.0.1:8000` in your browser.
 ```
 
 ---
+
+## Ablation Study (Professional Report)
+
+Use the built-in ablation runner to compare:
+1. Experiment 1: Full pipeline (LAQA + MRL + RAG)
+2. Experiment 2: No LAQA
+3. Experiment 3: No LAQA + No MRL
+4. Experiment 4: No RAG (direct LLM)
+
+### Dataset format
+
+Create a JSON file like `data/ablation_dataset.sample.json`:
+
+```json
+[
+  {
+    "question": "What are the symptoms of lung cancer?",
+    "reference": "Common symptoms include persistent cough, coughing blood, chest pain, shortness of breath, unexplained weight loss..."
+  }
+]
+```
+
+### Run study with metrics + graphs
+
+```bash
+python -m src.ablation.study --dataset data/ablation_dataset.sample.json --output-dir reports
+```
+
+This writes flat result files directly into `reports/`:
+- `experiment_1_per_question.csv`, `experiment_1_summary.csv`, `experiment_1_summary.json`
+- `experiment_2_per_question.csv`, `experiment_2_summary.csv`, `experiment_2_summary.json`
+- `experiment_3_per_question.csv`, `experiment_3_summary.csv`, `experiment_3_summary.json`
+- `experiment_4_per_question.csv`, `experiment_4_summary.csv`, `experiment_4_summary.json`
+- `ablation_summary.csv`, `ablation_summary.json`
+- `quality_metrics.png`
+- `latency_breakdown.png`
 
 ## Running Tests
 

@@ -1,0 +1,2 @@
+experiment,samples,blockedRate,confidenceScore,retrievalMs,generationMs,totalMs,accuracy,f1_score,bleu,gleu,rouge1,rouge_l,bert_score,sbert_similarity,distinct,llm_judge_normalised,faithfulness,answer_relevance,context_relevance,scope_avg
+Experiment 2,2,0.0,0.31847503781318665,23,28763.5,28786.5,0.5903890160183066,0.17059066501445683,0.0,0.03442785832659419,0.17059066501445683,0.10012391573729863,0.6435306071978639,0.7081103324890137,1.0,0.875,0.3725,0.7659499999999999,0.4577,0.42

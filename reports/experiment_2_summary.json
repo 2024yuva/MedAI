@@ -1,0 +1,23 @@
+{
+  "experiment": "Experiment 2",
+  "samples": 2,
+  "blockedRate": 0.0,
+  "confidenceScore": 0.31847503781318665,
+  "retrievalMs": 23,
+  "generationMs": 28763.5,
+  "totalMs": 28786.5,
+  "accuracy": 0.5903890160183066,
+  "f1_score": 0.17059066501445683,
+  "bleu": 0.0,
+  "gleu": 0.03442785832659419,
+  "rouge1": 0.17059066501445683,
+  "rouge_l": 0.10012391573729863,
+  "bert_score": 0.6435306071978639,
+  "sbert_similarity": 0.7081103324890137,
+  "distinct": 1.0,
+  "llm_judge_normalised": 0.875,
+  "faithfulness": 0.3725,
+  "answer_relevance": 0.7659499999999999,
+  "context_relevance": 0.4577,
+  "scope_avg": 0.42
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "question": "What are the symptoms of lung cancer?",
+    "reference": "Common symptoms include persistent cough, coughing blood, chest pain, shortness of breath, unexplained weight loss, fatigue, and recurrent chest infections."
+  },
+  {
+    "question": "When should someone seek emergency care for chest pain?",
+    "reference": "Emergency care is needed for severe or sudden chest pain, pain with shortness of breath, sweating, nausea, fainting, or pain spreading to the arm, jaw, or back."
+  }
+]

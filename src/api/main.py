@@ -8,7 +8,19 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from src.api.schemas import AskRequest, AskResponse, SourceReference
+from src.api.schemas import (
+    AskRequest, AskResponse,
+    AblationResponse, AblationExperimentResult,
+    EvaluationRequest, EvaluationResponse, ScopeScores, RagasScores,
+    SourceReference,
+)
+from src.ablation.runner import (
+    run_exp1_full_pipeline,
+    run_exp2_no_laqa,
+    run_exp3_no_laqa_no_mrl,
+    run_exp4_no_rag,
+)
+from src.ablation.evaluator import evaluate_experiment1
 from src.embeddings.service import EmbeddingService
 from src.generation.service import GenerationService
 from src.prompt.builder import PromptBuilder
@@ -114,6 +126,107 @@ def create_app(vector_db_path: str = "vector_db") -> FastAPI:
             blocked=False,
             blockReason=None,
         )
+
+    @app.post("/ablation/evaluate", response_model=EvaluationResponse)
+    def ablation_evaluate(payload: EvaluationRequest) -> EvaluationResponse:
+        """
+        Run Experiment 1 (full pipeline) and compute all 12 evaluation metrics.
+        Requires a ground-truth reference answer in the request body.
+        """
+        if not getattr(app.state, "index_ready", False):
+            raise HTTPException(status_code=503, detail="Service unavailable - index not built")
+
+        # Run full pipeline to get prediction + retrieved contexts
+        result = run_exp1_full_pipeline(
+            payload.question,
+            app.state.embedding_service,
+            app.state.vector_store,
+            app.state.generation_service,
+            app.state.prompt_builder,
+            app.state.safety_checker,
+        )
+
+        prediction = result.final_answer
+        context_texts = [s["excerpt"] for s in result.sources]
+
+        # Compute all 12 metrics
+        metrics = evaluate_experiment1(
+            question=payload.question,
+            prediction=prediction,
+            reference=payload.reference,
+            contexts=context_texts,
+            embedding_service=app.state.embedding_service,
+            generation_service=app.state.generation_service,
+        )
+
+        return EvaluationResponse(
+            question=payload.question,
+            prediction=prediction,
+            reference=payload.reference,
+            accuracy=metrics.accuracy,
+            f1_score=metrics.f1_score,
+            bleu=metrics.bleu,
+            gleu=metrics.gleu,
+            rouge1=metrics.rouge1,
+            rouge_l=metrics.rouge_l,
+            bert_score=metrics.bert_score,
+            sbert_similarity=metrics.sbert_similarity,
+            distinct=metrics.distinct,
+            scope=ScopeScores(**metrics.scope),
+            ragas=RagasScores(**metrics.ragas),
+            llm_judge_score=metrics.llm_judge_score,
+            llm_judge_normalised=metrics.llm_judge_normalised,
+            errors=metrics.errors,
+        )
+
+    @app.post("/ablation", response_model=AblationResponse)
+    def ablation(payload: AskRequest) -> AblationResponse:
+        if not getattr(app.state, "index_ready", False):
+            raise HTTPException(status_code=503, detail="Service unavailable - index not built")
+
+        runners = [
+            lambda q: run_exp1_full_pipeline(
+                q, app.state.embedding_service, app.state.vector_store,
+                app.state.generation_service, app.state.prompt_builder, app.state.safety_checker,
+            ),
+            lambda q: run_exp2_no_laqa(
+                q, app.state.embedding_service, app.state.vector_store,
+                app.state.generation_service, app.state.prompt_builder, app.state.safety_checker,
+            ),
+            lambda q: run_exp3_no_laqa_no_mrl(
+                q, app.state.embedding_service, app.state.vector_store,
+                app.state.generation_service, app.state.prompt_builder, app.state.safety_checker,
+            ),
+            lambda q: run_exp4_no_rag(q, app.state.generation_service, app.state.safety_checker),
+        ]
+
+        results = []
+        for run in runners:
+            r = run(payload.question)
+            results.append(AblationExperimentResult(
+                experiment=r.experiment,
+                description=r.description,
+                finalAnswer=r.final_answer,
+                reasoningSteps=r.reasoning_steps,
+                sources=[
+                    SourceReference(
+                        sourceFile=s["sourceFile"],
+                        pageNumber=s["pageNumber"],
+                        excerpt=s["excerpt"],
+                        similarityScore=s["similarityScore"],
+                    )
+                    for s in r.sources
+                ],
+                confidenceScore=r.confidence_score,
+                retrievalMs=r.retrieval_ms,
+                generationMs=r.generation_ms,
+                totalMs=r.total_ms,
+                blocked=r.blocked,
+                blockReason=r.block_reason,
+                augmentedQueries=r.augmented_queries,
+            ))
+
+        return AblationResponse(question=payload.question, results=results)
 
     return app
 
