@@ -324,7 +324,7 @@ Blocked responses return a safe fallback message. The system appends a "This is 
 
 ## Developer
 
-![2024yuva](https://www.github.com/2024yuva) - **Yuvarrunjitha R S**  
+[2024yuva](https://github.com/2024yuva) - **Yuvarrunjitha R S**  
 B.E. Computer Science and Engineering (AI & ML)
 
 ---
