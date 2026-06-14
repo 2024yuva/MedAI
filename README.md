@@ -126,7 +126,7 @@ MedAI/
 
 ## Demo
 
-[![Watch the demo](MedAI-Home.jpg)](MedAI-demo_video.mp4)
+[![Watch the demo](https://drive.google.com/file/d/1yZrheMyk_Vi5FMN1IAyStdsRMwV7yCaB/view?usp=drive_link)]
 
 > Click the image above to watch the demo video, or [download it directly](MedAI-demo_video.mp4).
 
