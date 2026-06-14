@@ -126,9 +126,13 @@ MedAI/
 
 ## Demo
 
-[![Watch the demo](https://drive.google.com/file/d/1yZrheMyk_Vi5FMN1IAyStdsRMwV7yCaB/view?usp=drive_link)]
+<p align="center">
+  <a href="https://drive.google.com/file/d/1yZrheMyk_Vi5FMN1IAyStdsRMwV7yCaB/view?usp=drive_link" target="_blank">
+    <img src="https://img.shields.io/badge/▶%20Watch%20Demo-4285F4?style=for-the-badge&logo=google-drive&logoColor=white" alt="Watch Demo">
+  </a>
+</p>
 
-> Click the image above to watch the demo video, or [download it directly](MedAI-demo_video.mp4).
+> Click the button above to watch the complete project demonstration.
 
 ---
 
