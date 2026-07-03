@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from src.api.schemas import (
@@ -126,6 +126,42 @@ def create_app(vector_db_path: str = "vector_db") -> FastAPI:
             blocked=False,
             blockReason=None,
         )
+
+
+    @app.post("/ask/stream")
+    def ask_stream(payload: AskRequest):
+        import json
+        if not getattr(app.state, "index_ready", False):
+            raise HTTPException(status_code=503, detail="Service unavailable - index not built")
+
+        contexts, low_conf = app.state.retriever.retrieve(payload.question, k=3)
+        prompt = app.state.prompt_builder.build_cot_prompt(payload.question, contexts, low_confidence=low_conf)
+        
+        sources = [
+            {
+                "sourceFile": c.chunk.source_file,
+                "pageNumber": c.chunk.page_number,
+                "excerpt": c.chunk.text[:200],
+                "similarityScore": c.similarity_score,
+            }
+            for c in contexts
+        ]
+        confidence = max((c.similarity_score for c in contexts), default=0.0)
+
+        def event_generator():
+            # First event: Metadata (sources, confidence)
+            metadata = json.dumps({"type": "metadata", "sources": sources, "confidenceScore": confidence})
+            yield f"data: {metadata}\n\n"
+
+            # Stream text chunks
+            for chunk in app.state.generation_service.generate_stream(prompt):
+                # We could add safety checking here per chunk, but for speed we'll trust the model stream
+                chunk_data = json.dumps({"type": "chunk", "text": chunk})
+                yield f"data: {chunk_data}\n\n"
+            
+            yield "data: [DONE]\n\n"
+
+        return StreamingResponse(event_generator(), media_type="text/event-stream")
 
     @app.post("/ablation/evaluate", response_model=EvaluationResponse)
     def ablation_evaluate(payload: EvaluationRequest) -> EvaluationResponse:

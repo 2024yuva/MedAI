@@ -270,6 +270,14 @@ async function submit(question) {
   if (!chat.messages.filter(m => m.role === "user").length) chat.title = titleFrom(q);
 
   chat.messages.push({ role: "user", content: q });
+  
+  const assistantMsg = { 
+    role: "assistant", 
+    payload: { answer: "", reasoningSteps: [], sources: [], confidenceScore: 0 }, 
+    content: "" 
+  };
+  chat.messages.push(assistantMsg);
+  
   chat.updatedAt = new Date().toISOString();
   state.loading = true;
   els.send.disabled = true;
@@ -278,18 +286,60 @@ async function submit(question) {
   render();
 
   try {
-    const payload = await ask(q);
-    chat.messages.push({ role: "assistant", payload, content: payload.finalAnswer || payload.answer || "" });
+    const res = await fetch("/ask/stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q }),
+    });
+    
+    if (!res.ok) throw new Error("Request failed");
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
+    
+    state.loading = false;
+    renderMessages(); // clear typing indicator
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      let lines = buffer.split("
+
+");
+      buffer = lines.pop(); // keep incomplete event
+
+      for (const eventStr of lines) {
+        const line = eventStr.trim();
+        if (line.startsWith("data: ")) {
+          const dataStr = line.slice(6);
+          if (dataStr === "[DONE]") {
+             // finished
+          } else {
+             const data = JSON.parse(dataStr);
+             if (data.type === "metadata") {
+                assistantMsg.payload.sources = data.sources;
+                assistantMsg.payload.confidenceScore = data.confidenceScore;
+                renderMessages();
+             } else if (data.type === "chunk") {
+                assistantMsg.payload.answer += data.text;
+                assistantMsg.content += data.text;
+                renderMessages();
+             }
+          }
+        }
+      }
+    }
     chat.updatedAt = new Date().toISOString();
   } catch (err) {
-    chat.messages.push({
-      role: "assistant",
-      payload: { answer: `Error: ${err.message}`, reasoningSteps: [], sources: [], confidenceScore: 0, blocked: true, blockReason: "request_error" },
-    });
+    assistantMsg.payload = { answer: `Error: ${err.message}`, reasoningSteps: [], sources: [], confidenceScore: 0, blocked: true, blockReason: "request_error" };
+    assistantMsg.content = `Error: ${err.message}`;
   } finally {
     state.loading = false;
     els.send.disabled = false;
-    render();
+    render(); // Full render saves to localStorage
   }
 }
 

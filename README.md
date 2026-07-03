@@ -191,13 +191,27 @@ To use fixed-size chunking instead of semantic chunking:
 python -m src.ingestion.build_index --data-dir data/oncology_mvp --out-dir vector_db --static-chunking
 ```
 
-### 6. Start the server
+### 6. Daily Start Guide (Opening the Project)
 
+Whenever you open a new session (like the next day for a demo), you only need to run these commands to start the project:
+
+1. **Activate your virtual environment**:
+```bash
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # macOS / Linux
+```
+
+2. **Start the backend server**:
 ```bash
 python -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000
 ```
+*(Make sure Ollama is running in the background on your machine.)*
 
+3. **Open the App**:
 Open `http://127.0.0.1:8000` in your browser.
+
+> **🆕 Recent Changes for Judges/Demos:**
+> The generation backend (`src/generation/service.py`) and prompt builder (`src/prompt/builder.py`) have been permanently optimized for **Demo Mode**. The Ollama generation is capped at a strict 100 token limit (`num_predict: 100`) and the model is explicitly instructed to skip "thinking" and provide a 1-2 sentence direct answer. This guarantees that your presentations to the judges will be lightning-fast without awkward loading delays!
 
 ---
 

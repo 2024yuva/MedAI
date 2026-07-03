@@ -43,5 +43,5 @@ User question:
 Context from medical references:
 {ctx}
 
-Answer in simple, clear language:
+Answer in 1-2 short sentences directly and quickly. Do not include reasoning or long explanations:
 """

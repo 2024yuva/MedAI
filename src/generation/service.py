@@ -72,7 +72,7 @@ class GenerationService:
 
     def _build_ollama_model(self, model_name: str):
         def _invoke(prompt: str) -> str:
-            payload_obj = {"model": model_name, "prompt": prompt, "stream": False}
+            payload_obj = {"model": model_name, "prompt": prompt, "stream": False, "options": {"num_predict": 100}}
             payload = json.dumps(payload_obj).encode("utf-8")
             LOGGER.warning("Ollama endpoint: %s", self.generate_endpoint)
             LOGGER.warning("Ollama model: %s", model_name)
@@ -136,6 +136,37 @@ class GenerationService:
                 "installedModels": [],
                 "primaryAvailable": False,
             }
+
+
+    def _build_ollama_stream_model(self, model_name: str):
+        def _invoke(prompt: str):
+            import json
+            payload_obj = {"model": model_name, "prompt": prompt, "stream": True, "options": {"num_predict": 100}}
+            payload = json.dumps(payload_obj).encode("utf-8")
+            req = request.Request(
+                url=self.generate_endpoint,
+                data=payload,
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
+            try:
+                with request.urlopen(req, timeout=self.request_timeout_s) as resp:
+                    for line in resp:
+                        if line:
+                            try:
+                                data = json.loads(line.decode("utf-8"))
+                                yield data.get("response", "")
+                            except json.JSONDecodeError:
+                                pass
+            except Exception as exc:
+                LOGGER.exception("Ollama stream failed")
+                yield f"\n[Error: {exc}]"
+
+        return _invoke
+
+    def generate_stream(self, prompt: str):
+        stream_func = self._build_ollama_stream_model(self.primary_model_name)
+        yield from stream_func(prompt)
 
     def generate(self, prompt: str) -> GenerationResult:
         start = time.time()
