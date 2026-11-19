@@ -3,6 +3,10 @@
 A production-grade Medical Question Answering system built on Retrieval-Augmented Generation (RAG). MedAI retrieves relevant passages from a curated medical knowledge base, reasons over them using a local language model, and returns plain-language answers with source citations and confidence scoring — all running entirely on your machine, with no external API calls.
 
 ---
+## Note
+
+The ```onco_final.ipynb``` file contains the complete implementation and detailed report of our group internship project completed during my Summer Internship at the National Institute of Technology (NIT), Karaikal.
+---
 
 ## Overview
 
@@ -23,33 +27,7 @@ MedAI is designed around a straightforward principle: answers should be grounded
 
 ## Architecture
 
-```
-User Question
-      |
-      v
- EmbeddingService                  sentence-transformers/all-MiniLM-L6-v2
- (query embedding)
-      |
-      v
- VectorStore.search                FAISS IndexFlatIP
- (top-k retrieval)
-      |
-      v
- PromptBuilder                     Injects retrieved chunks into prompt
- (context assembly)
-      |
-      v
- GenerationService                 Ollama  (phi3 / medgemma)
- (LLM inference)
-      |
-      v
- SafetyChecker                     Regex-based pattern matching
- (response filtering)
-      |
-      v
- AskResponse                       JSON  ->  Browser UI
- (answer + sources + confidence)
-```
+<img width="1263" height="518" alt="archi_medai" src="https://github.com/user-attachments/assets/ac4932bb-61dc-41fd-b67f-6d470948a6d7" />
 
 ---
 
@@ -104,6 +82,7 @@ MedAI/
 │   └── metadata.json           Chunk metadata (source, page, text)
 ├── tests/                      pytest test suite
 ├── requirements.txt
+├── onco_final.ipynb
 └── README.md
 ```
 ---
@@ -210,7 +189,7 @@ python -m uvicorn src.api.main:app --host 127.0.0.1 --port 8000
 3. **Open the App**:
 Open `http://127.0.0.1:8000` in your browser.
 
-> **🆕 Recent Changes for Judges/Demos:**
+> **Recent Changes for Judges/Demos:**
 > The generation backend (`src/generation/service.py`) and prompt builder (`src/prompt/builder.py`) have been permanently optimized for **Demo Mode**. The Ollama generation is capped at a strict 100 token limit (`num_predict: 100`) and the model is explicitly instructed to skip "thinking" and provide a 1-2 sentence direct answer. This guarantees that your presentations to the judges will be lightning-fast without awkward loading delays!
 
 ---
